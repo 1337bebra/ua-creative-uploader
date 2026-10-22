@@ -1,0 +1,8 @@
+[
+  {
+    "job_id": "creative_001",
+    "profile": "product_a",
+    "title": "creative_001",
+    "source": {"type": "local", "path": "creatives/video.mp4"}
+  }
+]

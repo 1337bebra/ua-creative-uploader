@@ -1,0 +1,20 @@
+[
+  {
+    "job_id": "video_001",
+    "profile": "product_a",
+    "title": "video_001",
+    "source": {"type": "local", "path": "creatives/video.mp4"}
+  },
+  {
+    "job_id": "image_001",
+    "profile": "product_a",
+    "title": "image_001",
+    "source": {"type": "local", "path": "creatives/banner.png"}
+  },
+  {
+    "job_id": "image_002",
+    "profile": "product_b",
+    "title": "image_002",
+    "source": {"type": "drive", "file_id": "REPLACE_WITH_DRIVE_FILE_ID"}
+  }
+]

@@ -1,0 +1,2 @@
+# Preserve exact Python bytes used by the generated source fingerprints.
+*.py -text

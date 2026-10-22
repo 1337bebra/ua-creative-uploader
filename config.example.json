@@ -1,0 +1,18 @@
+{
+  "api_version": "v26.0",
+  "state_dir": "state",
+  "max_file_bytes": 2147483648,
+  "drive_credentials_env": "GOOGLE_APPLICATION_CREDENTIALS",
+  "profiles": {
+    "product_a": {
+      "product": "product_a",
+      "account_id": "REPLACE_WITH_ACCOUNT_ID",
+      "token_env": "META_TOKEN_PRODUCT_A"
+    },
+    "product_b": {
+      "product": "product_b",
+      "account_id": "REPLACE_WITH_ACCOUNT_ID",
+      "token_env": "META_TOKEN_PRODUCT_B"
+    }
+  }
+}

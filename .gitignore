@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+state/
+config.json
+jobs.json
+creatives/
+.env
+.env.*
+*service-account*.json
+*credentials*.json
+ci-reports/
