@@ -8,6 +8,13 @@ Built around a practical UA operations task: discover creative assets from a fol
 
 **Status:** implemented with 61 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
 
+## Quick launch
+1) Create jobs.json and config.json (you have example files) in directory
+2) Put Meta Marketing API token and Account ID (Google Service Account with JSON key required)
+3) Run script via powershell
+4) Check your account creative library
+
+
 ## Features
 
 - MP4 video and static JPG/JPEG/PNG, including mixed batches.
