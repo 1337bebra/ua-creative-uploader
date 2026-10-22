@@ -6,7 +6,7 @@ Batch-upload video and static creatives to Meta ad-account media libraries from 
 
 Built around a practical UA operations task: take a manifest of creative assets, route each asset to the right account, and retain a verifiable result without blindly repeating uncertain uploads.
 
-**Status:** implemented with 55 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
+**Status:** implemented with 56 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
 
 ## Features
 

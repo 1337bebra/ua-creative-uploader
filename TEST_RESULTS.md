@@ -2,11 +2,9 @@
 
 Отчёт автоматически сформирован `run_tests.py` по результатам фактического запуска.
 
-Дата отчёта: 2026-10-22 (часовой пояс оператора).
+**Итог: PASS.** Запущено 56 тестов; PASS: 56; FAIL/ERROR: 0; SKIP: 0.
 
-**Итог: PASS.** Запущено 55 тестов; PASS: 55; FAIL/ERROR: 0; SKIP: 0.
-
-Среда: Python 3.12.14, Windows. Время: 2.891 с.
+Среда: Python 3.14.3, Windows. Время: 2.084 с.
 
 ## Что демонстрирует проверка
 
@@ -74,6 +72,7 @@ python run_tests.py --report TEST_RESULTS.md
 | `test_uploader.InputTests.test_header_and_size_validation` | PASS |
 | `test_uploader.InputTests.test_independent_profile_credentials` | PASS |
 | `test_uploader.InputTests.test_invalid_or_unknown_config_fields_rejected` | PASS |
+| `test_uploader.InputTests.test_misplaced_credential_is_never_echoed` | PASS |
 | `test_uploader.InputTests.test_offline_plan_requires_no_credentials_or_network` | PASS |
 | `test_uploader.InputTests.test_partial_upload_cli_returns_nonzero` | PASS |
 | `test_uploader.InputTests.test_relative_source_paths_use_manifest_location` | PASS |
@@ -94,7 +93,7 @@ python run_tests.py --report TEST_RESULTS.md
 
 SHA-256 набора Python-файлов позволяет отличить проверенную версию от последующих изменений; это контрольная сумма, не независимая сертификация.
 
-`06fbdcf7d2bfe163d89cc53c8c22d5af6fd28bd94415d58bc1879d870a63d9a7`
+`3594cb7f84950c4345fcd658c42732df5963382ee69bfcdadb7ce0e4a917dba9`
 
 | Файл | SHA-256 |
 |---|---|
@@ -103,8 +102,8 @@ SHA-256 набора Python-файлов позволяет отличить п�
 | `drive_fetch.py` | `02ac960c8d9090b582cb555679bfee15c9a3a173e33c2a8ee0a286e2f46cdaac` |
 | `make_release.py` | `952a7ac4e747b3dd76d305ff5184c434e09e34a54fe7cf408eb70b10c088fcef` |
 | `meta_api.py` | `d60bbd59972d52654bf2e3451eb306ca4298f5b99406670b81df7cd07433d270` |
-| `meta_secrets.py` | `4c6b2aa340881740fd54fdcdfc359a58c8129f953a87c44b2ff721ebc5f039a6` |
+| `meta_secrets.py` | `541c071972a5fe6edc11657338cba4499bb8f9657faa6ffcb700724a898b44b4` |
 | `meta_upload.py` | `7c42e3d780a6f9d4e2dd44fd6f6704da59c00ce7da412efa7cec7abc1e91b941` |
 | `run_tests.py` | `827b835c7cde6119dd1201a4c049419a7146dd6a34e0b36e567ce5a3ccf57021` |
 | `tests/test_images.py` | `1b7aaf18d6cfe29633fa50b286eb0f66366f82b5f706bc93f2a7af1ea0501cac` |
-| `tests/test_uploader.py` | `d110efd7eb498b7d21bbfe621da5eafd187536b2e005b700e87dadfa9d9a025e` |
+| `tests/test_uploader.py` | `4bbd2871ceda645afc93e47e0b1a24f33c9070e3303e62778d713d181353406a` |

@@ -12,6 +12,8 @@
 | common.py | Media inspection, validated input, atomic JSON, bounded HTTPS reads and sanitized errors |
 | run_tests.py | Network-disabled test runner and generated Markdown evidence with source fingerprints |
 
+Credential configuration stores environment-variable names only. These references are bounded in length, and credential errors never echo their configured values, so a token mistakenly pasted into a reference field cannot be repeated in diagnostics.
+
 ## Identity and persistence
 
 The unique asset key is `(account_id, SHA-256 of staged file bytes)`. Profile/product labels

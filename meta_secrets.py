@@ -20,7 +20,7 @@ class Profile:
     def token(self):
         value = os.environ.get(self.token_env, "").strip()
         if not value or any(ord(ch) < 32 for ch in value):
-            raise UserError(f"Set a valid token in environment variable {self.token_env}")
+            raise UserError("Set a valid Meta token in the environment variable named by token_env")
         return value
 
     def app_secret(self):
@@ -28,7 +28,7 @@ class Profile:
             return None
         value = os.environ.get(self.app_secret_env, "").strip()
         if not value or any(ord(ch) < 32 for ch in value):
-            raise UserError(f"Set a valid app secret in environment variable {self.app_secret_env}")
+            raise UserError("Set a valid app secret in the environment variable named by app_secret_env")
         return value
 
 
@@ -59,12 +59,12 @@ def load_config(path):
             raise UserError("Each profile needs a numeric account_id, optionally prefixed with act_")
         account = account if account.startswith("act_") else "act_" + account
         token_env = item.get("token_env")
-        if not isinstance(token_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", token_env):
-            raise UserError("token_env must name an environment variable")
+        if not isinstance(token_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", token_env):
+            raise UserError("token_env must contain a short environment-variable name, not a token value")
         product = identifier(item.get("product"), "product")
         app_secret_env = item.get("app_secret_env")
-        if app_secret_env is not None and (not isinstance(app_secret_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", app_secret_env)):
-            raise UserError("app_secret_env must name an environment variable")
+        if app_secret_env is not None and (not isinstance(app_secret_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", app_secret_env)):
+            raise UserError("app_secret_env must contain a short environment-variable name, not a secret value")
         profiles[name] = Profile(name, product, account, token_env, app_secret_env)
     limit = raw.get("max_file_bytes", 2 * 1024 ** 3)
     if type(limit) is not int or limit < 1:

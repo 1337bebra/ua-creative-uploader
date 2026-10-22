@@ -229,6 +229,25 @@ class InputTests(Workspace):
             load_config(path)
         self.assertNotIn("should-never", str(error.exception))
 
+    def test_misplaced_credential_is_never_echoed(self):
+        fake_credential = "EAA" + "x" * 96
+        for field in ("token_env", "app_secret_env"):
+            with self.subTest(field=field):
+                path = self.config()
+                raw = json.loads(path.read_text(encoding="utf-8"))
+                raw["profiles"]["a"][field] = fake_credential
+                path.write_text(json.dumps(raw), encoding="utf-8")
+                with contextlib.redirect_stderr(io.StringIO()) as errors:
+                    code = main(["--config", str(path), "status"])
+                self.assertEqual(code, 2)
+                self.assertNotIn(fake_credential, errors.getvalue())
+        for key in ("token_env", "app_secret_env"):
+            profile = Profile("a", "a", "act_100", "EAA" + "x" * 20,
+                              "EAA" + "x" * 20 if key == "app_secret_env" else None)
+            with patch.dict(os.environ, {}, clear=True), self.assertRaises(UserError) as error:
+                profile.token() if key == "token_env" else profile.app_secret()
+            self.assertNotIn("EAA", str(error.exception))
+
     def test_duplicate_jobs_unknown_profile_and_unsafe_id_rejected(self):
         cases = [[self.job(), self.job()], [self.job(profile="missing")], [self.job(name="../outside")]]
         for data in cases:
