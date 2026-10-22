@@ -6,7 +6,7 @@ Batch-upload video and static creatives to Meta ad-account media libraries from 
 
 Built around a practical UA operations task: discover creative assets from a folder or manifest, route each asset to the right account, and retain a verifiable result without blindly repeating uncertain uploads.
 
-**Status:** implemented with 61 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
+**Status:** implemented with 61 passing local offline tests. The operator also confirmed a live static-image upload appearing in Meta's Account images library. The offline tests use fake Meta/Drive responses and block socket connections; the screenshot does not establish video processing, Drive delivery or ad approval. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
 
 ## Quick launch
 1) Create jobs.json and config.json (you have example files) in directory
@@ -76,7 +76,7 @@ Place optional jobs in a JSON array. See [mixed-batch example](jobs.mixed.exampl
 
 The shared [AGENTS.md](AGENTS.md) defines the assistant's execution boundaries, credential handling, source inspection, verification and reporting rules. [CLAUDE.md](CLAUDE.md) points to that same instruction file.
 
-AI assisted in breaking the workflow into modules, identifying failure paths, implementing the adapters and recovery logic, and creating executable tests. Calculations, state transitions and API calls are ordinary Python code; the uploader does not call an LLM at runtime. No production usage or measured buying impact is claimed by this repository.
+AI assisted in breaking the workflow into modules, identifying failure paths, implementing the adapters and recovery logic, and creating executable tests. Calculations, state transitions and API calls are ordinary Python code; the uploader does not call an LLM at runtime. A live static-image library upload was operator-confirmed; no measured buying impact is claimed by this repository.
 
 ## Limits and recovery
 

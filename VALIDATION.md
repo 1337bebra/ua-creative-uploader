@@ -5,6 +5,11 @@ The generated [TEST_RESULTS.md](TEST_RESULTS.md) contains every actual test outc
 runtime details and source hashes. Socket connections are disabled by run_tests.py.
 No live advertising or Drive requests were made by this test run.
 
+Separate from the offline suite, the operator confirmed a live static-image upload: the
+creative appeared under Account images in a Meta ad account. The account identifiers
+and screenshot are not published. This is evidence for that image-library path, not
+for video encoding, Drive delivery or ad approval.
+
 The test suite runs offline with synthetic bytes and fake Meta/Drive responses. Test-only
 IDs and API version values are fixtures, not production credentials or support claims.
 
@@ -36,8 +41,8 @@ Run: `python -m unittest discover -s tests -v`.
 Generate shareable evidence: `python run_tests.py --report TEST_RESULTS.md`.
 This command generates results from execution, not from a manually asserted pass count.
 
-Not verified: actual Meta/Google account authorization, production API payload acceptance,
-Google auth refresh against live credentials, real media decoding/encoding or placement approval, macOS/Linux execution,
+Not verified here: live video or Drive delivery, Google auth refresh against live credentials,
+real media decoding/encoding or placement approval, macOS/Linux execution,
 and distributed/network-filesystem behavior. Local testing was performed on Windows.
 
 Before first operational use: configure one profile, run plan/check, upload one small MP4
