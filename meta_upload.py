@@ -13,7 +13,7 @@ from common import UserError, atomic_json, identifier, inspect_media, mime_for_p
 from creative_archive import Archive, StateLock
 from drive_fetch import DriveSource
 from meta_api import MetaClient, remote_id
-from meta_secrets import load_config, load_jobs
+from meta_secrets import load_config, load_directory_jobs, load_jobs
 
 
 def error_message(error):
@@ -205,7 +205,10 @@ def parser():
     sub = cli.add_subparsers(dest="command", required=True)
     for name in ("plan", "check", "upload"):
         command = sub.add_parser(name)
-        command.add_argument("--jobs", required=True)
+        source = command.add_mutually_exclusive_group(required=True)
+        source.add_argument("--jobs")
+        source.add_argument("--directory")
+        command.add_argument("--profile", help="Required with --directory; selects its account")
         if name == "upload":
             command.add_argument("--wait-seconds", type=int, default=30)
     sub.add_parser("status")
@@ -228,7 +231,14 @@ def main(argv=None):
     try:
         settings = load_config(args.config)
         if args.command in {"plan", "check", "upload"}:
-            jobs = load_jobs(args.jobs, settings)
+            if args.directory:
+                if not args.profile:
+                    raise UserError("--profile is required with --directory")
+                jobs, ignored = load_directory_jobs(args.directory, args.profile, settings)
+            else:
+                if args.profile:
+                    raise UserError("--profile is only used with --directory; jobs select their own profiles")
+                jobs, ignored = load_jobs(args.jobs, settings), 0
             if args.command == "plan":
                 plan = []
                 for job in jobs:
@@ -239,16 +249,19 @@ def main(argv=None):
                         path = job["source"]["path"]
                         item.update(inspect_media(path, settings.max_file_bytes, mime_for_path(path)))
                     plan.append(item)
-                print(json.dumps({"mode": "offline_plan", "jobs": plan}, ensure_ascii=False, indent=2))
+                print(json.dumps({"mode": "offline_plan", "total": len(plan), "ignored_files": ignored,
+                                  "jobs": plan}, ensure_ascii=False, indent=2))
                 return 0
             if args.command == "upload" and not 0 <= args.wait_seconds <= 3600:
                 raise UserError("wait-seconds must be between 0 and 3600")
             clients, drive = preflight(settings, jobs)
             if args.command == "check":
-                print("Read access and sources checked. Upload permission and encoding still require an actual upload.")
+                print(f"Read access and {len(jobs)} sources checked ({ignored} unsupported files ignored). "
+                      "Upload permission and encoding still require an actual upload.")
                 return 0
             report, output = batch(settings, jobs, clients, drive, args.wait_seconds)
-            print(json.dumps({"run_id": report["run_id"], "counts": report["counts"], "results_file": str(output)}, indent=2))
+            print(json.dumps({"run_id": report["run_id"], "counts": report["counts"],
+                              "ignored_files": ignored, "results_file": str(output)}, indent=2))
             return 1 if report["counts"]["unresolved"] else 0
         with StateLock(settings.state_dir):
             archive = Archive(settings.state_dir)

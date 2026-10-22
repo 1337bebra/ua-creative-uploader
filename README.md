@@ -4,14 +4,15 @@
 
 Batch-upload video and static creatives to Meta ad-account media libraries from local files or Google Drive.
 
-Built around a practical UA operations task: take a manifest of creative assets, route each asset to the right account, and retain a verifiable result without blindly repeating uncertain uploads.
+Built around a practical UA operations task: discover creative assets from a folder or manifest, route each asset to the right account, and retain a verifiable result without blindly repeating uncertain uploads.
 
-**Status:** implemented with 56 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
+**Status:** implemented with 61 passing local offline tests. Tests use fake Meta/Drive responses and block socket connections. Live account authorization, API acceptance and media processing have not yet been validated. This tool uploads library assets; it does not create ads, launch campaigns or change budgets.
 
 ## Features
 
 - MP4 video and static JPG/JPEG/PNG, including mixed batches.
-- Named product/account profiles with separate environment-based credentials.
+- Named product/account profiles with tokens in ignored local config or environment variables.
+- Recursive folder batches: no per-file manifest entries needed for one account.
 - Offline planning and read-only preflight before upload.
 - Streamed multipart uploads with bounded memory use.
 - Account-scoped content deduplication backed by SQLite.
@@ -37,17 +38,19 @@ The test suite generates synthetic media fixtures, uses fake API responses and d
 ## Use with your accounts
 
 1. Copy `config.example.json` to `config.json`, fill in your account IDs, and remove unused example profiles.
-2. Set the environment variables referenced by each profile. Never put tokens into source files or manifests.
-3. Copy a jobs example to `jobs.json` and point it at your own creatives.
+2. Put each token in the empty `token` field of the private `config.json`. That file is Git-ignored and excluded from release packages; it contains plaintext secrets, so keep it private. Use `token_env` instead if you prefer environment variables.
+3. Put your MP4/JPG/PNG assets in `creatives/`, including subfolders if useful.
 4. Inspect the plan, check access, then explicitly run the upload:
 
 ```sh
-python meta_upload.py --config config.json plan --jobs jobs.json
-python meta_upload.py --config config.json check --jobs jobs.json
-python meta_upload.py --config config.json upload --jobs jobs.json
+python meta_upload.py --config config.json plan --directory creatives --profile product_a
+python meta_upload.py --config config.json check --directory creatives --profile product_a
+python meta_upload.py --config config.json upload --directory creatives --profile product_a
 ```
 
-`upload` performs real external writes. Start with one small asset of each needed format. The full [user guide in Russian](USER_GUIDE.md) covers credentials, Drive setup, outputs and recovery commands.
+`upload` performs real external writes. Start with one small asset of each needed format. Files are processed sequentially; folder discovery removes manifest editing, not API transfer time. The full [user guide in Russian](USER_GUIDE.md) covers credentials, Drive setup, outputs and recovery commands.
+
+Use `--jobs jobs.json` instead of `--directory ... --profile ...` when a batch needs per-file account routing, custom titles or Google Drive sources.
 
 Minimal image job:
 
@@ -60,7 +63,7 @@ Minimal image job:
 }
 ```
 
-Place jobs in a JSON array. See [mixed-batch example](jobs.mixed.example.json). Google Drive support additionally requires `python -m pip install -r requirements-drive.txt`.
+Place optional jobs in a JSON array. See [mixed-batch example](jobs.mixed.example.json). Google Drive support additionally requires `python -m pip install -r requirements-drive.txt`.
 
 ## AI development instructions
 

@@ -15,7 +15,7 @@ from common import ApiError, UserError, inspect_media
 from creative_archive import Archive
 from drive_fetch import DriveSource
 from meta_api import MetaClient
-from meta_secrets import Profile, Settings, load_jobs
+from meta_secrets import Profile, Settings, load_directory_jobs, load_jobs
 from meta_upload import batch, main, preflight
 
 
@@ -102,6 +102,50 @@ class ImageTests(unittest.TestCase):
     def invoke(self, command, digest, *args):
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             return main(["--config", str(self.config()), command, "--profile", "a", "--sha256", digest, *args])
+
+    def test_directory_batch_discovers_nested_media_and_ignores_other_files(self):
+        folder = self.root / "creatives"
+        nested = folder / "set"
+        nested.mkdir(parents=True)
+        (folder / "banner.png").write_bytes(PNG)
+        (nested / "clip.MP4").write_bytes(VIDEO)
+        (folder / "notes.txt").write_text("ignore", encoding="utf-8")
+        jobs, ignored = load_directory_jobs(folder, "a", self.settings)
+        again, _ = load_directory_jobs(folder, "a", self.settings)
+        self.assertEqual(ignored, 1)
+        self.assertEqual(jobs, again)
+        self.assertEqual([j["title"] for j in jobs], ["banner", "clip"])
+        self.assertEqual(len({j["job_id"] for j in jobs}), 2)
+        with contextlib.redirect_stdout(io.StringIO()) as output, patch("socket.socket", side_effect=AssertionError("Network forbidden")):
+            code = main(["--config", str(self.config()), "plan", "--directory", str(folder), "--profile", "a"])
+        self.assertEqual(code, 0)
+        plan = json.loads(output.getvalue())
+        self.assertEqual((plan["total"], plan["ignored_files"]), (2, 1))
+        self.assertEqual({j["media_type"] for j in plan["jobs"]}, {"image", "video"})
+
+    def test_directory_upload_uses_existing_dedupe_without_network(self):
+        folder = self.root / "creatives"
+        folder.mkdir()
+        (folder / "banner.png").write_bytes(PNG)
+        client = FakeImageMeta()
+        args = ["--config", str(self.config()), "upload", "--directory", str(folder), "--profile", "a", "--wait-seconds", "0"]
+        with patch("meta_upload.preflight", return_value=({"a": client}, None)), contextlib.redirect_stdout(io.StringIO()) as first:
+            self.assertEqual(main(args), 0)
+        with patch("meta_upload.preflight", return_value=({"a": client}, None)), contextlib.redirect_stdout(io.StringIO()) as second:
+            self.assertEqual(main(args), 0)
+        self.assertEqual(json.loads(first.getvalue())["counts"]["ready"], 1)
+        self.assertEqual(json.loads(second.getvalue())["counts"]["skipped"], 1)
+        self.assertEqual(client.image_posts, 1)
+
+    def test_directory_requires_profile_and_media(self):
+        folder = self.root / "empty"
+        folder.mkdir()
+        with self.assertRaises(UserError):
+            load_directory_jobs(folder, "a", self.settings)
+        with contextlib.redirect_stderr(io.StringIO()) as errors:
+            code = main(["--config", str(self.config()), "plan", "--directory", str(folder)])
+        self.assertEqual(code, 2)
+        self.assertIn("--profile", errors.getvalue())
 
     def test_png_and_jpeg_uploads_preserve_type_and_remote_hash(self):
         jpg = self.root / "photo.JPEG"

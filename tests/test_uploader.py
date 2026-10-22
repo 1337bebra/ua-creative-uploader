@@ -211,6 +211,31 @@ class InputTests(Workspace):
             preflight(self.settings, [self.job(), self.job("two", profile="b")], factory)
         self.assertEqual(seen, [("secret-a", "act_100"), ("secret-b", "act_200")])
 
+    def test_private_config_token_works_without_environment_and_is_not_reported(self):
+        path = self.config()
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw["profiles"]["a"].pop("token_env")
+        raw["profiles"]["a"]["token"] = "private-test-token"
+        path.write_text(json.dumps(raw), encoding="utf-8")
+        profile = load_config(path).profiles["a"]
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(profile.token(), "private-test-token")
+        self.assertNotIn("private-test-token", repr(profile))
+        raw["profiles"]["a"]["token"] = ""
+        path.write_text(json.dumps(raw), encoding="utf-8")
+        with self.assertRaises(UserError) as error:
+            load_config(path).profiles["a"].token()
+        self.assertNotIn("private-test-token", str(error.exception))
+
+    def test_config_rejects_ambiguous_token_sources_without_echo(self):
+        path = self.config()
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        raw["profiles"]["a"]["token"] = "private-test-token"
+        path.write_text(json.dumps(raw), encoding="utf-8")
+        with self.assertRaises(UserError) as error:
+            load_config(path)
+        self.assertNotIn("private-test-token", str(error.exception))
+
     def test_offline_plan_requires_no_credentials_or_network(self):
         manifest = self.root / "jobs.json"
         manifest.write_text(json.dumps([self.job()]), encoding="utf-8")

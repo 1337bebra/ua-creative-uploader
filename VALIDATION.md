@@ -1,6 +1,6 @@
 # Validation
 
-Latest local result: **55 tests passed**, with no skips, on Windows, 22 October 2026.
+Latest local result: **61 tests passed**, with no skips, on Windows, 23 October 2026.
 The generated [TEST_RESULTS.md](TEST_RESULTS.md) contains every actual test outcome,
 runtime details and source hashes. Socket connections are disabled by run_tests.py.
 No live advertising or Drive requests were made by this test run.
@@ -14,7 +14,8 @@ Covered behaviors:
 - Different content with the same title uploads separately; matching content is scoped to account.
 - Start/transfer/finish failures and crash intents block blind resubmission.
 - Processing, processing failure and status read failure remain distinct from readiness.
-- Separate profiles use separate environment credentials.
+- Separate profiles use separate credentials; ignored local config tokens and environment references are supported.
+- Recursive folder discovery selects one explicit profile, creates stable jobs, counts ignored files and retains deduplication.
 - Offline planning does not access the network or require tokens.
 - Input schemas, source paths, file size/header and duplicate job IDs are checked.
 - Multipart size/slice and bounded GET retries are verified; POST is not retried.

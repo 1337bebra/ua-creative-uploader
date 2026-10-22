@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass
+import hashlib
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from common import MEDIA_MIMES, UserError, identifier, read_json, require_keys
@@ -14,13 +15,14 @@ class Profile:
     name: str
     product: str
     account: str
-    token_env: str
+    token_env: str | None
     app_secret_env: str | None = None
+    token_value: str | None = field(default=None, repr=False)
 
     def token(self):
-        value = os.environ.get(self.token_env, "").strip()
-        if not value or any(ord(ch) < 32 for ch in value):
-            raise UserError("Set a valid Meta token in the environment variable named by token_env")
+        value = self.token_value if self.token_value is not None else os.environ.get(self.token_env or "", "")
+        if not value or value != value.strip() or any(ord(ch) < 33 for ch in value):
+            raise UserError("Set a valid Meta token in this profile's token field or token_env variable")
         return value
 
     def app_secret(self):
@@ -53,19 +55,24 @@ def load_config(path):
     profiles = {}
     for name, item in raw["profiles"].items():
         identifier(name, "profile name")
-        require_keys(item, {"product", "account_id", "token_env", "app_secret_env"}, "profile")
+        require_keys(item, {"product", "account_id", "token_env", "token", "app_secret_env"}, "profile")
         account = str(item.get("account_id", ""))
         if not re.fullmatch(r"(?:act_)?[0-9]+", account):
             raise UserError("Each profile needs a numeric account_id, optionally prefixed with act_")
         account = account if account.startswith("act_") else "act_" + account
+        if ("token" in item) == ("token_env" in item):
+            raise UserError("Each profile needs exactly one of token or token_env")
         token_env = item.get("token_env")
-        if not isinstance(token_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", token_env):
+        token_value = item.get("token")
+        if "token_env" in item and (not isinstance(token_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", token_env)):
             raise UserError("token_env must contain a short environment-variable name, not a token value")
+        if "token" in item and (not isinstance(token_value, str) or len(token_value) > 4096):
+            raise UserError("token must be a string of at most 4096 characters")
         product = identifier(item.get("product"), "product")
         app_secret_env = item.get("app_secret_env")
         if app_secret_env is not None and (not isinstance(app_secret_env, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", app_secret_env)):
             raise UserError("app_secret_env must contain a short environment-variable name, not a secret value")
-        profiles[name] = Profile(name, product, account, token_env, app_secret_env)
+        profiles[name] = Profile(name, product, account, token_env, app_secret_env, token_value)
     limit = raw.get("max_file_bytes", 2 * 1024 ** 3)
     if type(limit) is not int or limit < 1:
         raise UserError("max_file_bytes must be a positive integer")
@@ -111,3 +118,28 @@ def load_jobs(path, settings):
             raise UserError("source must specify either local/path or drive/file_id")
         jobs.append({"job_id": job_id, "profile": profile, "title": title.strip(), "source": inspect_source})
     return jobs
+
+
+def load_directory_jobs(directory, profile, settings):
+    if profile not in settings.profiles:
+        raise UserError("Select an existing profile with --profile")
+    root = Path(directory).resolve()
+    if not root.is_dir():
+        raise UserError("--directory must point to an existing folder")
+    files = sorted((p for p in root.rglob("*") if p.is_file() and not p.is_symlink()),
+                   key=lambda p: (p.relative_to(root).as_posix().casefold(), p.relative_to(root).as_posix()))
+    jobs, ignored = [], 0
+    for path in files:
+        if path.suffix.lower() not in MEDIA_MIMES:
+            ignored += 1
+            continue
+        relative = path.relative_to(root).as_posix()
+        title = path.stem.strip()
+        if not title or len(title) > 200 or any(ord(ch) < 32 for ch in title):
+            raise UserError("Each media filename must provide a title of 1-200 characters without control characters")
+        job_id = "file_" + hashlib.sha256(relative.encode("utf-8")).hexdigest()[:24]
+        jobs.append({"job_id": job_id, "profile": profile, "title": title,
+                     "source": {"type": "local", "path": str(path)}})
+    if not jobs:
+        raise UserError("No MP4, JPG, JPEG or PNG files found in --directory")
+    return jobs, ignored

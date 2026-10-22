@@ -7,12 +7,12 @@
     "product_a": {
       "product": "product_a",
       "account_id": "REPLACE_WITH_ACCOUNT_ID",
-      "token_env": "META_TOKEN_PRODUCT_A"
+      "token": ""
     },
     "product_b": {
       "product": "product_b",
       "account_id": "REPLACE_WITH_ACCOUNT_ID",
-      "token_env": "META_TOKEN_PRODUCT_B"
+      "token": ""
     }
   }
 }

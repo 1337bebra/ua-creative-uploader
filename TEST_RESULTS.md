@@ -2,9 +2,11 @@
 
 Отчёт автоматически сформирован `run_tests.py` по результатам фактического запуска.
 
-**Итог: PASS.** Запущено 56 тестов; PASS: 56; FAIL/ERROR: 0; SKIP: 0.
+Дата отчёта: 2026-10-23 (часовой пояс оператора).
 
-Среда: Python 3.14.3, Windows. Время: 2.084 с.
+**Итог: PASS.** Запущено 61 тестов; PASS: 61; FAIL/ERROR: 0; SKIP: 0.
+
+Среда: Python 3.14.3, Windows. Время: 3.637 с.
 
 ## Что демонстрирует проверка
 
@@ -34,6 +36,9 @@ python run_tests.py --report TEST_RESULTS.md
 |---|---|
 | `test_images.ImageTests.test_adopt_wrong_account_image_is_rejected` | PASS |
 | `test_images.ImageTests.test_bad_png_crc_truncation_and_animated_png_are_rejected` | PASS |
+| `test_images.ImageTests.test_directory_batch_discovers_nested_media_and_ignores_other_files` | PASS |
+| `test_images.ImageTests.test_directory_requires_profile_and_media` | PASS |
+| `test_images.ImageTests.test_directory_upload_uses_existing_dedupe_without_network` | PASS |
 | `test_images.ImageTests.test_drive_static_batch_routes_image` | PASS |
 | `test_images.ImageTests.test_drive_static_download_and_mime_spoofing` | PASS |
 | `test_images.ImageTests.test_extension_content_mismatch_is_rejected` | PASS |
@@ -68,6 +73,7 @@ python run_tests.py --report TEST_RESULTS.md
 | `test_uploader.BatchTests.test_unknown_write_outcomes_are_not_retried` | PASS |
 | `test_uploader.DriveTests.test_drive_changed_source_or_partial_content_rejected` | PASS |
 | `test_uploader.DriveTests.test_drive_download_validates_content` | PASS |
+| `test_uploader.InputTests.test_config_rejects_ambiguous_token_sources_without_echo` | PASS |
 | `test_uploader.InputTests.test_duplicate_jobs_unknown_profile_and_unsafe_id_rejected` | PASS |
 | `test_uploader.InputTests.test_header_and_size_validation` | PASS |
 | `test_uploader.InputTests.test_independent_profile_credentials` | PASS |
@@ -75,6 +81,7 @@ python run_tests.py --report TEST_RESULTS.md
 | `test_uploader.InputTests.test_misplaced_credential_is_never_echoed` | PASS |
 | `test_uploader.InputTests.test_offline_plan_requires_no_credentials_or_network` | PASS |
 | `test_uploader.InputTests.test_partial_upload_cli_returns_nonzero` | PASS |
+| `test_uploader.InputTests.test_private_config_token_works_without_environment_and_is_not_reported` | PASS |
 | `test_uploader.InputTests.test_relative_source_paths_use_manifest_location` | PASS |
 | `test_uploader.RecoveryTests.test_adopt_checks_account_membership` | PASS |
 | `test_uploader.RecoveryTests.test_deleted_or_unreadable_known_object_requires_explicit_resolution` | PASS |
@@ -93,7 +100,7 @@ python run_tests.py --report TEST_RESULTS.md
 
 SHA-256 набора Python-файлов позволяет отличить проверенную версию от последующих изменений; это контрольная сумма, не независимая сертификация.
 
-`3594cb7f84950c4345fcd658c42732df5963382ee69bfcdadb7ce0e4a917dba9`
+`52e69201a4ac3276dba3816ce9b6b1d8f0400b415527257b807fcf305cba2a41`
 
 | Файл | SHA-256 |
 |---|---|
@@ -102,8 +109,8 @@ SHA-256 набора Python-файлов позволяет отличить п�
 | `drive_fetch.py` | `02ac960c8d9090b582cb555679bfee15c9a3a173e33c2a8ee0a286e2f46cdaac` |
 | `make_release.py` | `952a7ac4e747b3dd76d305ff5184c434e09e34a54fe7cf408eb70b10c088fcef` |
 | `meta_api.py` | `d60bbd59972d52654bf2e3451eb306ca4298f5b99406670b81df7cd07433d270` |
-| `meta_secrets.py` | `541c071972a5fe6edc11657338cba4499bb8f9657faa6ffcb700724a898b44b4` |
-| `meta_upload.py` | `7c42e3d780a6f9d4e2dd44fd6f6704da59c00ce7da412efa7cec7abc1e91b941` |
+| `meta_secrets.py` | `9e9d95682735d30137260573698f2916da80549ccf2d1c9b312532ce6e296c56` |
+| `meta_upload.py` | `6997324c8d394b64afb4e15ec6743aa7b6900f862d39072f53b14f45ff904d08` |
 | `run_tests.py` | `827b835c7cde6119dd1201a4c049419a7146dd6a34e0b36e567ce5a3ccf57021` |
-| `tests/test_images.py` | `1b7aaf18d6cfe29633fa50b286eb0f66366f82b5f706bc93f2a7af1ea0501cac` |
-| `tests/test_uploader.py` | `4bbd2871ceda645afc93e47e0b1a24f33c9070e3303e62778d713d181353406a` |
+| `tests/test_images.py` | `2fdeae50d221ae3822103f2ab409d64148f8d63cf99efb83e07462187f2e3126` |
+| `tests/test_uploader.py` | `bb092927bd4c758641905a4b071c78228093bfd792b0d41f0442009ea0cdbf4e` |

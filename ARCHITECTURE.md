@@ -5,14 +5,16 @@
 | Module | Responsibility |
 |---|---|
 | meta_upload.py | CLI, preflight, batch orchestration and recovery commands |
-| meta_secrets.py | Typed configuration and environment credential references; no embedded secrets |
+| meta_secrets.py | Typed configuration, private token or environment reference, and folder job discovery |
 | drive_fetch.py | Optional service-account authentication, streamed Drive download and revision/checksum verification |
 | creative_archive.py | SQLite asset registry, transactional audit and OS process lock |
 | meta_api.py | Direct Meta video/image adapter, streamed multipart, account checks and media availability |
 | common.py | Media inspection, validated input, atomic JSON, bounded HTTPS reads and sanitized errors |
 | run_tests.py | Network-disabled test runner and generated Markdown evidence with source fingerprints |
 
-Credential configuration stores environment-variable names only. These references are bounded in length, and credential errors never echo their configured values, so a token mistakenly pasted into a reference field cannot be repeated in diagnostics.
+Each profile specifies exactly one token source: a direct value in the ignored local `config.json` or an environment-variable name. Direct values are plaintext on disk and excluded from Git by `.gitignore` and from the release allowlist. The program never prints them in its own diagnostics or reports. Environment references are bounded in length; a token mistakenly pasted into `token_env` is rejected without echoing it.
+
+`--directory` recursively discovers supported extensions under one folder and generates jobs for one explicitly selected profile. The title is the filename stem; the job ID is a stable hash of the relative path. Unsupported files are counted and ignored. For mixed account routing, custom titles and Drive sources, `--jobs` keeps explicit per-file control. Discovery changes operator effort, not the sequential upload or Meta throughput.
 
 ## Identity and persistence
 
